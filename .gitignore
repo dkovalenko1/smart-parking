@@ -1,0 +1,19 @@
+# Go
+*.exe
+*.test
+*.out
+/tmp
+/bin
+vendor/
+
+# Env
+.env
+*.env
+
+# IDE
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+.gocache/
