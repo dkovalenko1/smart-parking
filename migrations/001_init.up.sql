@@ -39,3 +39,23 @@ CREATE TABLE IF NOT EXISTS bills (
     paid_at          TIMESTAMPTZ
 );
 
+INSERT INTO parking_zones (id, name, description)
+VALUES
+    ('11111111-1111-1111-1111-111111111111', 'Zone A', 'Main outdoor parking area'),
+    ('22222222-2222-2222-2222-222222222222', 'Zone B', 'Secondary outdoor parking area'),
+    ('33333333-3333-3333-3333-333333333333', 'Underground', 'Underground parking area')
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO spots (id, zone_id, number, type, status)
+VALUES
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1', '11111111-1111-1111-1111-111111111111', 'A-01', 'regular', 'available'),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2', '11111111-1111-1111-1111-111111111111', 'A-02', 'regular', 'available'),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3', '11111111-1111-1111-1111-111111111111', 'A-03', 'ev', 'available'),
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa4', '11111111-1111-1111-1111-111111111111', 'A-04', 'disabled', 'available'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1', '22222222-2222-2222-2222-222222222222', 'B-01', 'regular', 'available'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2', '22222222-2222-2222-2222-222222222222', 'B-02', 'regular', 'reserved'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb3', '22222222-2222-2222-2222-222222222222', 'B-03', 'ev', 'available'),
+    ('cccccccc-cccc-cccc-cccc-ccccccccccc1', '33333333-3333-3333-3333-333333333333', 'U-01', 'regular', 'available'),
+    ('cccccccc-cccc-cccc-cccc-ccccccccccc2', '33333333-3333-3333-3333-333333333333', 'U-02', 'ev', 'occupied'),
+    ('cccccccc-cccc-cccc-cccc-ccccccccccc3', '33333333-3333-3333-3333-333333333333', 'U-03', 'disabled', 'maintenance')
+ON CONFLICT (zone_id, number) DO NOTHING;
