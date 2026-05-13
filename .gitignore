@@ -5,6 +5,7 @@
 /tmp
 /bin
 vendor/
+/go.sum
 
 # Env
 .env
