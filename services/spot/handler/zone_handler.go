@@ -22,7 +22,7 @@ func NewZoneHandler(service *service.ZoneService, logger *logger.Logger) *ZoneHa
 func (h *ZoneHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	var request CreateZoneRequest
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
-		writeError(writer, http.StatusBadRequest, "invalid request body")
+		h.writeError(writer, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
@@ -33,15 +33,19 @@ func (h *ZoneHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrEmptyZoneName):
-			writeError(writer, http.StatusBadRequest, "invalid request body, name is required")
+			h.writeError(writer, http.StatusBadRequest, "invalid request body, name is required")
+		case errors.Is(err, model.ErrEmptyZoneDescription):
+			h.writeError(writer, http.StatusBadRequest, "invalid request body, zone description is required")
+		case errors.Is(err, model.ErrZoneAlreadyExists):
+			h.writeError(writer, http.StatusConflict, "parking zone already exists")
 		default:
 			h.logger.Error("failed to create parking zone: ", err)
-			writeError(writer, http.StatusInternalServerError, "internal server error")
+			h.writeError(writer, http.StatusInternalServerError, "internal server error")
 		}
 		return
 	}
 
-	writeJSON(writer, http.StatusCreated, toZoneResponse(zone))
+	h.writeJSON(writer, http.StatusCreated, toZoneResponse(zone))
 }
 
 func toZoneResponse(zone *model.Zone) CreateZoneResponse {
@@ -53,14 +57,14 @@ func toZoneResponse(zone *model.Zone) CreateZoneResponse {
 	}
 }
 
-func writeError(writer http.ResponseWriter, status int, msg string) {
-	writeJSON(writer, status, ErrorResponse{Error: msg})
+func (h *ZoneHandler) writeError(writer http.ResponseWriter, status int, msg string) {
+	h.writeJSON(writer, status, ErrorResponse{Error: msg})
 }
 
-func writeJSON(writer http.ResponseWriter, status int, data any) {
+func (h *ZoneHandler) writeJSON(writer http.ResponseWriter, status int, data any) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(status)
 	if err := json.NewEncoder(writer).Encode(data); err != nil {
-		logger.Error("failed to write response: ", err)
+		h.logger.Error("failed to write response: ", err)
 	}
 }

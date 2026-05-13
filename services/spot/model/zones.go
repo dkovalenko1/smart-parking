@@ -21,6 +21,9 @@ func CreatNewZone(name, description string) (zone *Zone, err error) {
 	if name == "" {
 		return nil, ErrEmptyZoneName
 	}
+	if description == "" {
+		return nil, ErrEmptyZoneDescription
+	}
 
 	now := time.Now().UTC()
 	return &Zone{
