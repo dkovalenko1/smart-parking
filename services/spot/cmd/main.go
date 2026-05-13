@@ -40,7 +40,7 @@ func runMigrations(dbURL string) error {
 func mustEnv(key string) string {
 	v := os.Getenv(key)
 	if v == "" {
-		logger.Error("missing required env variable: ", "key", key)
+		logger.Error("missing required env variable: ", key)
 		os.Exit(1)
 	}
 	return v
