@@ -3,20 +3,26 @@ package main
 import (
 	"context"
 	"errors"
+	"net/http"
 	"os"
+	"smart-parking/services/spot/handler"
+	"smart-parking/services/spot/repository"
+	"smart-parking/services/spot/service"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
-	logger "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	var logger = log.New()
 	logger.SetReportCaller(true)
 
 	dbURL := mustEnv("DATABASE_URL")
+	port := mustEnv("PORT")
 
 	if err := runMigrations(dbURL); err != nil {
 		logger.Fatal("migrations failed: ", err)
@@ -36,6 +42,15 @@ func main() {
 		logger.Fatal("database ping failed: ", err)
 	}
 	logger.Info("database ping succeeded")
+
+	zoneRepo := repository.NewZoneRepository(pool)
+	zoneService := service.NewZoneService(zoneRepo, logger)
+	router := handler.NewRouter(zoneService, logger)
+
+	logger.Info("starting server")
+	if err := http.ListenAndServe(":"+port, router); err != nil {
+		logger.Fatal("server error: ", err)
+	}
 }
 
 func runMigrations(dbURL string) error {
@@ -56,7 +71,7 @@ func runMigrations(dbURL string) error {
 func mustEnv(key string) string {
 	v := os.Getenv(key)
 	if v == "" {
-		logger.Fatal("missing required env variable: ", key)
+		log.Fatal("missing required env variable: ", key)
 	}
 	return v
 }
