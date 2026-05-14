@@ -45,7 +45,7 @@ func main() {
 
 	zoneRepo := repository.NewZoneRepository(pool, logger)
 	zoneService := service.NewZoneService(zoneRepo, logger)
-	router := handler.NewRouter(zoneService, logger)
+	router := handler.NewRouter(zoneService, pool, logger)
 
 	logger.Info("starting server")
 	if err := http.ListenAndServe(":"+port, router); err != nil {
