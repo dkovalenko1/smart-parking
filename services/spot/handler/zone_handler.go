@@ -48,6 +48,17 @@ func (h *ZoneHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	writeJSON(writer, h.logger, http.StatusCreated, toZoneResponse(zone))
 }
 
+func (h *ZoneHandler) Get(writer http.ResponseWriter, req *http.Request) {
+	zones, err := h.service.GetParkingZones(req.Context())
+	if err != nil {
+		h.logger.Error("failed to get parking zones: ", err)
+		writeError(writer, h.logger, http.StatusInternalServerError, "internal server error")
+		return
+	}
+
+	writeJSON(writer, h.logger, http.StatusOK, zones)
+}
+
 func toZoneResponse(zone *model.Zone) CreateZoneResponse {
 	return CreateZoneResponse{
 		ID:          zone.ID,

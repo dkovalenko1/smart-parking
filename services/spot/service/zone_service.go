@@ -20,19 +20,29 @@ func NewZoneService(zones ZoneRepository, logger *logger.Logger) *ZoneService {
 	}
 }
 
-func (p *ZoneService) CreateParkingZone(ctx context.Context, args CreateParkingZoneArgs) (*model.Zone, error) {
-	p.logger.Info("creating parking zone ", args.Name)
+func (s *ZoneService) CreateParkingZone(ctx context.Context, args CreateParkingZoneArgs) (*model.Zone, error) {
+	s.logger.Info("creating parking zone ", args.Name)
 	zone, err := model.CreatNewZone(args.Name, args.Description)
 	if err != nil {
 		return nil, fmt.Errorf("error creating parking zone: %w", err)
 	}
-	p.logger.Info("parking zone ", args.Name, "created")
+	s.logger.Info("parking zone ", args.Name, "created")
 
-	p.logger.Info("saving parking zone ", args.Name)
-	if err := p.zones.Save(ctx, zone); err != nil {
+	s.logger.Info("saving parking zone ", args.Name)
+	if err := s.zones.Save(ctx, zone); err != nil {
 		return nil, fmt.Errorf("error saving parking zone : %w", err)
 	}
-	p.logger.Info("parking zone ", args.Name, " saved")
+	s.logger.Info("parking zone ", args.Name, " saved")
 
 	return zone, nil
+}
+
+func (s *ZoneService) GetParkingZones(ctx context.Context) ([]model.Zone, error) {
+	s.logger.Info("getting parking zones")
+	zones, err := s.zones.GetZones(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error getting parking zones: %w", err)
+	}
+
+	return zones, nil
 }

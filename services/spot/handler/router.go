@@ -22,5 +22,7 @@ func NewRouter(zoneSvc *service.ZoneService, pool *pgxpool.Pool, logger *logger.
 
 	router.Post("/zones", zoneHandler.Create)
 	router.Get("/health", healthHandler.Check)
+	router.Get("/zones", zoneHandler.Get)
+
 	return router
 }
