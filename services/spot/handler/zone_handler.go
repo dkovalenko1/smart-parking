@@ -7,6 +7,8 @@ import (
 	"smart-parking/services/spot/model"
 	"smart-parking/services/spot/service"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -45,7 +47,7 @@ func (h *ZoneHandler) Create(writer http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	writeJSON(writer, h.logger, http.StatusCreated, toZoneResponse(zone))
+	writeJSON(writer, h.logger, http.StatusCreated, zone)
 }
 
 func (h *ZoneHandler) Get(writer http.ResponseWriter, req *http.Request) {
@@ -59,11 +61,25 @@ func (h *ZoneHandler) Get(writer http.ResponseWriter, req *http.Request) {
 	writeJSON(writer, h.logger, http.StatusOK, zones)
 }
 
-func toZoneResponse(zone *model.Zone) CreateZoneResponse {
-	return CreateZoneResponse{
-		ID:          zone.ID,
-		Name:        zone.Name,
-		Description: zone.Description,
-		CreatedAt:   zone.CreatedAt,
+func (h *ZoneHandler) GetById(writer http.ResponseWriter, req *http.Request) {
+	idString := chi.URLParam(req, "id")
+	id, err := uuid.Parse(idString)
+	if err != nil {
+		writeError(writer, h.logger, http.StatusBadRequest, "invalid parking zone id")
+		return
 	}
+
+	zone, err := h.service.GetParkingZoneById(req.Context(), id)
+	if err != nil {
+		switch {
+		case errors.Is(err, model.ErrZoneNotFound):
+			writeError(writer, h.logger, http.StatusNotFound, "parking zone not found")
+		default:
+			h.logger.Error("failed to get parking zone by id: ", err)
+			writeError(writer, h.logger, http.StatusInternalServerError, "internal server error")
+		}
+		return
+	}
+
+	writeJSON(writer, h.logger, http.StatusOK, zone)
 }

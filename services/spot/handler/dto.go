@@ -18,6 +18,10 @@ type CreateZoneResponse struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+type GetZoneByIdRequest struct {
+	ID uuid.UUID `json:"id"`
+}
+
 type ErrorResponse struct {
 	Error string `json:"error"`
 }

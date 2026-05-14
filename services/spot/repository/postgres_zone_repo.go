@@ -5,6 +5,7 @@ import (
 	"errors"
 	"smart-parking/services/spot/model"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -56,4 +57,20 @@ func (repo *ZoneRepository) GetZones(ctx context.Context) ([]model.Zone, error) 
 	}
 
 	return zones, nil
+}
+
+func (repo *ZoneRepository) GetZoneById(ctx context.Context, id uuid.UUID) (*model.Zone, error) {
+	row := repo.pool.QueryRow(ctx, `SELECT id, name, description, created_at FROM parking_zones where id = $1`, id)
+
+	var zone model.Zone
+	err := row.Scan(&zone.ID, &zone.Name, &zone.Description, &zone.CreatedAt)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, model.ErrZoneNotFound
+	}
+	if err != nil {
+		repo.logger.Error("error on getting parking zone by id: ", err)
+		return nil, err
+	}
+
+	return &zone, nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"smart-parking/services/spot/model"
 
+	"github.com/google/uuid"
 	logger "github.com/sirupsen/logrus"
 )
 
@@ -45,4 +46,14 @@ func (s *ZoneService) GetParkingZones(ctx context.Context) ([]model.Zone, error)
 	}
 
 	return zones, nil
+}
+
+func (s *ZoneService) GetParkingZoneById(ctx context.Context, id uuid.UUID) (*model.Zone, error) {
+	s.logger.Info("getting parking zone ", id)
+	zone, err := s.zones.GetZoneById(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("error getting parking zone by id: %w", err)
+	}
+
+	return zone, nil
 }
