@@ -48,7 +48,14 @@ func main() {
 	router := handler.NewRouter(zoneService, pool, logger)
 
 	logger.Info("starting server")
-	if err := http.ListenAndServe(":"+port, router); err != nil {
+	server := &http.Server{
+		Addr:         ":" + port,
+		Handler:      router,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+	if err := server.ListenAndServe(); err != nil {
 		logger.Fatal("server error: ", err)
 	}
 }
