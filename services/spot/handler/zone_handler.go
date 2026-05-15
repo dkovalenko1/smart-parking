@@ -23,7 +23,9 @@ func NewZoneHandler(service *service.ZoneService, logger *logger.Logger) *ZoneHa
 
 func (h *ZoneHandler) Create(writer http.ResponseWriter, req *http.Request) {
 	var request CreateZoneRequest
-	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
+	decoder := json.NewDecoder(req.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&request); err != nil {
 		writeError(writer, h.logger, http.StatusBadRequest, "invalid request body")
 		return
 	}

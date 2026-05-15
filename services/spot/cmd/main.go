@@ -44,8 +44,10 @@ func main() {
 	logger.Info("database ping succeeded")
 
 	zoneRepo := repository.NewZoneRepository(pool, logger)
+	spotRepo := repository.NewSpotRepository(pool, logger)
 	zoneService := service.NewZoneService(zoneRepo, logger)
-	router := handler.NewRouter(zoneService, pool, logger)
+	spotService := service.NewSpotService(spotRepo, logger)
+	router := handler.NewRouter(zoneService, spotService, pool, logger)
 
 	logger.Info("starting server")
 	server := &http.Server{

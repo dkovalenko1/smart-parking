@@ -14,7 +14,7 @@ type Zone struct {
 	CreatedAt   time.Time `json:"createdAt" db:"created_at"`
 }
 
-func CreatNewZone(name, description string) (zone *Zone, err error) {
+func CreateNewZone(name, description string) (zone *Zone, err error) {
 	name = strings.TrimSpace(name)
 	description = strings.TrimSpace(description)
 

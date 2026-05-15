@@ -23,7 +23,7 @@ func NewZoneService(zones ZoneRepository, logger *logger.Logger) *ZoneService {
 
 func (s *ZoneService) CreateParkingZone(ctx context.Context, args CreateParkingZoneArgs) (*model.Zone, error) {
 	s.logger.Info("creating parking zone ", args.Name)
-	zone, err := model.CreatNewZone(args.Name, args.Description)
+	zone, err := model.CreateNewZone(args.Name, args.Description)
 	if err != nil {
 		return nil, fmt.Errorf("error creating parking zone: %w", err)
 	}
